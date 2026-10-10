@@ -1,0 +1,12 @@
+.env
+.idea/
+.vscode/
+node_modules/
+dist/
+target/
+__pycache__/
+.pytest_cache/
+.venv/
+uploads/
+work/
+outputs/

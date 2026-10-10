@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: nestly
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/nestly?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:nestly}
+    password: ${SPRING_DATASOURCE_PASSWORD:nestly_dev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+server:
+  error:
+    include-message: always
+nestly:
+  jwt-secret: ${NESTLY_JWT_SECRET:change-me-to-a-long-random-secret-at-least-32-characters}
+  ai-url: ${NESTLY_AI_URL:http://localhost:8000}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
