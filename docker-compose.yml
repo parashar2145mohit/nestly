@@ -33,9 +33,11 @@ services:
 
   frontend:
     build: ./frontend
+    environment:
+      PORT: 80
+      BACKEND_HOSTPORT: backend:8080
     ports: ["3000:80"]
     depends_on: [backend]
 
 volumes:
   nestly_mysql:
-

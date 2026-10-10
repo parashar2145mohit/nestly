@@ -1,0 +1,90 @@
+services:
+  - type: pserv
+    name: nestly-mysql
+    runtime: image
+    region: singapore
+    plan: 0.5c-512mb
+    image:
+      url: docker.io/library/mysql:8.4
+    disk:
+      name: nestly-mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_DATABASE
+        value: nestly
+      - key: MYSQL_USER
+        value: nestly
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
+  - type: web
+    name: nestly-ai
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerContext: ./ai-service
+    dockerfilePath: ./ai-service/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: LLM_API_KEY
+        sync: false
+
+  - type: web
+    name: nestly-backend
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /v3/api-docs
+    envVars:
+      - key: MYSQL_HOST
+        fromService:
+          name: nestly-mysql
+          type: pserv
+          property: host
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_DATABASE
+        value: nestly
+      - key: MYSQL_USER
+        value: nestly
+      - key: MYSQL_PASSWORD
+        fromService:
+          name: nestly-mysql
+          type: pserv
+          envVarKey: MYSQL_PASSWORD
+      - key: NESTLY_AI_HOST
+        fromService:
+          name: nestly-ai
+          type: web
+          property: host
+      - key: NESTLY_AI_PORT
+        fromService:
+          name: nestly-ai
+          type: web
+          property: port
+      - key: NESTLY_JWT_SECRET
+        generateValue: true
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+
+  - type: web
+    name: nestly-web
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: BACKEND_HOSTPORT
+        fromService:
+          name: nestly-backend
+          type: web
+          property: hostport

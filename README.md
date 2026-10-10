@@ -48,3 +48,25 @@ cd backend && ./mvnw spring-boot:run
 ## Environment
 
 See `.env.example`. Change all secrets outside development.
+
+## Deploy the complete stack on Render
+
+The root `render.yaml` is a Render Blueprint for the complete Nestly stack:
+
+- `nestly-web`: public React/Nginx web service
+- `nestly-backend`: public Spring Boot API
+- `nestly-ai`: FastAPI AI web service (used over Render's private network)
+- `nestly-mysql`: private MySQL 8 service with a 10 GB persistent disk
+
+Deployment steps:
+
+1. Push this repository to GitHub.
+2. Open the Render Dashboard and choose **New → Blueprint**.
+3. Connect the GitHub repository and select `render.yaml`.
+4. Review the resources and provide any optional secret values Render requests. Razorpay and LLM keys can be left blank for the local-demo feature set.
+5. Apply the Blueprint and wait for MySQL, AI, backend, and web deployments to become healthy.
+6. Open the `nestly-web` URL shown by Render.
+
+Render automatically generates the MySQL passwords and JWT secret. They are never committed to the repository. All services are configured in the Singapore region. MySQL uses a persistent disk and therefore requires a paid Render resource; review Render's estimated monthly cost before applying the Blueprint.
+
+For production, change the seeded demo passwords or remove `DemoDataConfig`, configure real payment/LLM keys, and restrict public access to Swagger and the AI service if they are not meant to be exposed.
